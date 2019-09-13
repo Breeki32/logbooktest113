@@ -39,4 +39,27 @@ public class DemoApplicationTests {
 		Assert.assertNotNull(response.getBody());
 	}
 
+	/**
+	 * With the Logging Level set to something that would lead to requests not getting logged (=INFO), Logbook "eats" the body of the
+	 * response from the Camunda UI...
+	 */
+	@Test
+	public void camundaLandingPageIsNull() {
+		DemoApplication.main(new String[] { "--server.port=32406", "--logging.level.org.zalando=INFO" });
+		ResponseEntity<String> response = new RestTemplate().getForEntity("http://localhost:32406/", String.class);
+		Assert.assertEquals(200, response.getStatusCodeValue());
+		Assert.assertNull(response.getBody());
+	}
+
+	/**
+	 * ... but if the log level is set to TRACE and therefore activates the logging, the response is complete again.
+	 */
+	@Test
+	public void camundaLandingPageIsNotNull() {
+		DemoApplication.main(new String[] { "--server.port=32407", "--logging.level.org.zalando=TRACE" });
+		ResponseEntity<String> response = new RestTemplate().getForEntity("http://localhost:32407/", String.class);
+		Assert.assertEquals(200, response.getStatusCodeValue());
+		Assert.assertNotNull(response.getBody());
+	}
+
 }
